@@ -1,3 +1,3 @@
 # React Başlangıç Projesi
 
-bu kodlar, b,r react projesine başlangıç için gerekli paketleri içerir.
+bu kodlar, bir react projesine başlangıç için gerekli paketleri içerir.
