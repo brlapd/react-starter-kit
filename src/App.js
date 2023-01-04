@@ -1,89 +1,138 @@
-import { useState, useReducer, useCallback, useMemo } from "react"
-import Header from "./components/Header";
-import AddTodo from "./components/AddTodo";
-import Todos from "./components/Todos";
-
-
-function reducer(state, action) {
-    //console.log(state, action);
-    switch (action.type) {
-        case 'SET_TODO':
-            return {
-                ...state,
-                todo: action.value
-            }
-        case 'ADD_TODO':
-            return {
-                ...state,
-                todo: '',
-                todos: [
-                    ...state.todos,
-                    action.todo
-                ]
-            }
-        case 'SET_SEARCH':
-            return {
-                ...state,
-                search: action.value
-            }
-    }
-}
+import { useEffect, useMemo, useState } from "react";
 
 function App() {
 
-    const [state, dispatch] = useReducer(reducer, {
-        todos: [],
-        todo: '',
-        search: ''
-    });
+    const genders = [
+        { key: "1", value: "Erkek" },
+        { key: "2", value: "Kadın" }
+    ];
 
-    const [count, setCount] = useState(1);
+    const categoryList = [
+        { key: 1, value: "PHP" },
+        { key: 2, value: "JavaScript" },
+        { key: 3, value: "CSS" },
+        { key: 4, value: "HTML" }
+    ];
 
-    const submitHandle = useCallback(e => {
-        e.preventDefault()
-        //setTodos([...todos, todo]);
-        //setTodo('');
+    const levels = [
+        { key: 'beginner', value: 'Başlangıç' },
+        { key: 'jr_developer', value: 'Jr. Developer' },
+        { key: 'sr_developer', value: 'Sr. Developer' }
+    ]
 
-        dispatch({
-            type: 'ADD_TODO',
-            todo: state.todo
-        })
-    }, [state.todo])
+    const [name, setName] = useState('');
+    const [description, setDescription] = useState('aaa');
+    const [gender, setGender] = useState('');
+    const [categories, setCategories] = useState([2, 4]);
+    const [level, setLevel] = useState('jr_developer');
+    const [avatar, setAvatar] = useState(false);
+    const [image, setImage] = useState('');
 
-    const onChange = useCallback(e => {
-        //setTodo(e.target.value)
-        dispatch({
-            type: 'SET_TODO',
-            value: e.target.value
-        })
-    }, [])
+    useEffect(() => {
+        if (avatar) {
+            const fileReader = new FileReader();
+            fileReader.addEventListener('load', function () {
+                setImage(this.result);
+            })
+            fileReader.readAsDataURL(avatar);
+        }
+    }, [avatar])
 
-    const searchHandle = e => {
-        dispatch({
-            type: 'SET_SEARCH',
-            value: e.target.value
-        })
+    const [rule, setRule] = useState(true);
+    const [rules, setRules] = useState([
+        { key: 1, value: '1. Kuralı kabul ediyorum', checked: false },
+        { key: 2, value: '2. Kuralı kabul ediyorum', checked: false },
+        { key: 3, value: '3. Kuralı kabul ediyorum', checked: true }
+    ]);
+
+    const checkRule = (key, checked) => {
+        setRules(rules => rules.map(rule => {
+            if (key == rule.key) {
+                rule.checked = checked
+            }
+            return rule;
+        }))
     }
 
-    const filteredTodos = useMemo(() => {
-        return state.todos.filter(todo => todo.toLocaleLowerCase("TR").includes(state.search.toLocaleLowerCase("TR")))
-    }, [state.todos, state.search]);
+    const submitHandle = () => {
+        const formData = new FormData();
+        formData.append('avatar', avatar);
+        formData.append('name', name);
+        fetch('https://xxx', {
+            method: 'POST',
+            body: formData
+        });
+    }
+
+    const selectedGender = genders.find(g => g.key == gender);
+    const selectedCategories = categories && categoryList.filter(c => categories.includes(c.key));
+    const disabled = rules.every(rule => rule.checked) || !avatar;
+    const selectedLevel = levels.find(l => l.key == level);
 
     return (
         <>
-            <Header />
-            <div>{count}</div>
-            <button onClick={() => setCount(count + 1)}>
-                artır
-            </button>
-            <hr />
-            <h1>Todo App</h1>
-            <input type="text" value={state.search} placeholder="Ara" onChange={searchHandle} />
-            <hr />
-            <AddTodo onChange={onChange} submitHandle={submitHandle} todo={state.todo} />
-            <Todos todos={filteredTodos} />
+            <input type="text" value={name} onChange={e => setName(e.target.value)} />
+            <br />
+            <textarea value={description} onChange={e => setDescription(e.target.value)}></textarea>
+            <br />
+            <select value={gender} onChange={e => setGender(e.target.value)}>
+                <option value="">Seçiniz</option>
+                {genders.map(gender => (
+                    <option value={gender.key} key={gender.key}>{gender.value}</option>
+                ))}
+            </select>
+            <br />
+            <button onClick={() => setCategories([1, 2, 3])}>Set Categories</button><br />
+            <select size="10" value={categories} multiple={true} onChange={e => setCategories([...e.target.selectedOptions].map(option => +option.value))}>
+                <option value="">Seçiniz</option>
+                {categoryList.map(category => (
+                    <option value={category.key} key={category.key}>{category.value}</option>
+                ))}
+            </select>
+            <br />
+            <label>
+                <input type="checkbox" checked={rule} onChange={e => setRule(e.target.checked)} /> Kuralları kabul ediyorum.
+            </label>
+            <br />
+            <button onClick={submitHandle} disabled={!disabled}>Devam Et</button>
+            <br />
+            {rules.map(rule => (
+                <label key={rule.key}>
+                    <input type="checkbox" checked={rule.checked} onChange={e => checkRule(rule.key, e.target.checked)} /> {rule.value}
+                </label>
+            ))}
+            <br />
+            {levels.map((l, index) => (
+                <label key={index}>
+                    <input type="radio" checked={l.key == level} value={l.key} onChange={e => setLevel(e.target.value)} /> {l.value}
+                </label>
+            ))}
+            <br />
+            {avatar && (
+                <>
+                    <h3>{avatar.name}</h3>
+                    {image && <img src={image} alt="" />}
+                </>
+            )}
+            <br />
+            <label>
+                <input type="file" onChange={e => setAvatar(e.target.files[0])} />
+            </label>
+            <br />
+            <pre>
+                {JSON.stringify(selectedLevel, null, 2)}
+            </pre>
+            <pre>
+                {JSON.stringify(rules, null, 2)}
+            </pre>
+            <pre>
+                {JSON.stringify(selectedGender, null, 2)}
+            </pre>
+            <pre>
+                {JSON.stringify(selectedCategories, null, 2)}
+            </pre>
         </>
     )
 }
 
-export default App
+export default App;
