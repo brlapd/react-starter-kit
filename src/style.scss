@@ -5,3 +5,13 @@
         background-color: blue;
     }
 }
+
+nav a {
+    display: inline-block;
+    padding: 5px;
+}
+
+a.aktif,
+a.active {
+    color: #F00;
+}
