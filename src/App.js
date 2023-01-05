@@ -1,5 +1,6 @@
 
-import SiteProvider from "./context/SiteContext";
+import { SiteProvider, AuthProvider } from "./context";
+
 import Home from "./components/Home";
 
 function App() {
@@ -7,7 +8,9 @@ function App() {
 
     return (
         <SiteProvider>
-            <Home />
+            <AuthProvider>
+                <Home />
+            </AuthProvider>
         </SiteProvider>
     )
 }

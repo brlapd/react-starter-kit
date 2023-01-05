@@ -1,12 +1,22 @@
-import { createContext } from "react";
-import { useState } from "react";
+import { createContext, useContext, useReducer } from "react";
+import { siteReducer } from "../reducer"
 
-
-export const Context = createContext();
+const Context = createContext();
 
 
 const Provider = ({ children }) => {
 
+    const [state, dispatch] = useReducer(siteReducer, {
+        theme: localStorage.getItem('theme') || 'light',
+        language: localStorage.getItem('language') || 'tr'
+    });
+
+    const data = {
+        ...state,
+        dispatch
+    }
+
+    /*
     const [theme, setTheme] = useState('light');
     const [language, setLanguage] = useState('tr');
 
@@ -16,6 +26,7 @@ const Provider = ({ children }) => {
         language,
         setLanguage
     }
+*/
 
     return (
         <Context.Provider value={data}>
@@ -24,5 +35,6 @@ const Provider = ({ children }) => {
     )
 }
 
+export const useSite = () => useContext(Context);
 
 export default Provider

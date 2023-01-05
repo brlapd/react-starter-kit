@@ -1,14 +1,19 @@
-import { useContext } from "react"
-import SiteContext, { Context } from "../context/SiteContext"
+import { useSite } from "../context"
 
 function SwitchTheme() {
 
-    const { theme, setTheme } = useContext(Context);
+    const { theme, dispatch } = useSite();
+
+    const switchTheme = () => {
+        dispatch({
+            type: 'TOGGLE_THEME'
+        })
+    }
 
     return (
         <>
             Mevcut tema = {theme} <br />
-            <button onClick={() => setTheme(theme == 'light' ? 'dark' : 'light')}>Temayı değiştir</button>
+            <button onClick={switchTheme}>Temayı değiştir</button>
         </>
     )
 }

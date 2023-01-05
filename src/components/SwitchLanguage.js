@@ -1,14 +1,20 @@
-import { useContext } from "react"
-import SiteContext, { Context } from "../context/SiteContext"
+
+import { useSite } from "../context"
 
 function SwitchLanguage() {
 
-    const { language, setLanguage } = useContext(Context);
+    const { language, dispatch } = useSite();
+
+    const switchLanguage = () => {
+        dispatch({
+            type: 'TOGGLE_LANGUAGE'
+        })
+    }
 
     return (
         <>
             Mevcut dil = {language} <br />
-            <button onClick={() => setLanguage(language == 'tr' ? 'en' : 'tr')}>Dili değiştir</button>
+            <button onClick={switchLanguage}>Dili değiştir</button>
         </>
     )
 }
